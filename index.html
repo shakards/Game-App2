@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming App</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        /* Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff6ec4, #7873f5, #43c6ac);
+            background-size: 300% 300%;
+            animation: gradientMove 6s infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container h1 {
+            font-size: 4rem;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+            margin-bottom: 1rem;
+        }
+
+        .container p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Start Button */
+        .start-btn {
+            font-size: 1.5rem;
+            color: white;
+            padding: 1rem 2.5rem;
+            border: 2px solid white;
+            background: transparent;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .start-btn:hover {
+            background: white;
+            color: #333;
+            transform: scale(1.1);
+        }
+
+        /* Game Canvas */
+        #gameCanvas {
+            display: none;
+            margin: 0 auto;
+            border: 2px solid white;
+            background: black;
+        }
+
+        /* Moving Stars */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .stars span {
+            position: absolute;
+            display: block;
+            background: white;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: moveStars 5s linear infinite;
+        }
+
+        @keyframes moveStars {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(800px) translateX(200px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Stars -->
+    <div class="stars">
+        <!-- Generate 100 stars -->
+        <script>
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('span');
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.animationDuration = Math.random() * 3 + 2 + 's';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                document.querySelector('.stars').appendChild(star);
+            }
+        </script>
+    </div>
+
+    <!-- Gaming App Content -->
+    <div class="container">
+        <h1>Welcome to StarQuest</h1>
+        <p>Embark on an interstellar adventure!</p>
+        <button class="start-btn" id="startGame">Start Game</button>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+    <script>
+        const startButton = document.getElementById('startGame');
+        const gameCanvas = document.getElementById('gameCanvas');
+        const ctx = gameCanvas.getContext('2d');
+
+        // Ball properties
+        let ball = { x: 250, y: 250, radius: 10, dx: 0, dy: 0 };
+
+        // Event Listener to Start the Game
+        startButton.addEventListener('click', () => {
+            document.querySelector('.container').style.display = 'none';
+            gameCanvas.style.display = 'block';
+            startGame();
+        });
+
+        // Event Listeners for Controls
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') ball.dy = -2;
+            if (e.key === 'ArrowDown') ball.dy = 2;
+            if (e.key === 'ArrowLeft') ball.dx = -2;
+            if (e.key === 'ArrowRight') ball.dx = 2;
+        });
+
+        window.addEventListener('keyup', () => {
+            ball.dx = 0;
+            ball.dy = 0;
+        });
+
+        // Draw Ball
+        function drawBall() {
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Update Ball Position
+        function updateBall() {
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Prevent Ball from Exiting Canvas
+            if (ball.x < ball.radius) ball.x = ball.radius;
+            if (ball.x > gameCanvas.width - ball.radius) ball.x = gameCanvas.width - ball.radius;
+            if (ball.y < ball.radius) ball.y = ball.radius;
+            if (ball.y > gameCanvas.height - ball.radius) ball.y = gameCanvas.height - ball.radius;
+        }
+
+        // Start Game
+        function startGame() {
+            setInterval(() => {
+                updateBall();
+                drawBall();
+            }, 20);
+        }
+    </script>
+</body>
+</html>
